@@ -36,60 +36,99 @@ class Sprite():
             Sprite.pen.shapesize(0.2, 0.2, 0)
         else:
             Sprite.pen.shapesize(1, 1, 0)
+
+
         Sprite.pen.goto(self.x, self.y)
         Sprite.pen.shape(self.shape)
         Sprite.pen.color(self.color)
         Sprite.pen.stamp()
+
     def move(self):
         self.x += self.dx
+        self.y += self.dy
+
+        # Boarder checks
+        if self.unit == "defender-weapon" and self.x > 600:
+                self.x = -1000
+                self.active = False
+
+        if self.unit == "attacker":
+            if self.y >300 or self.y < -300:
+                self.dy *= -1
+
+    def is_collision(self, other, tolerance):
+        d = ((self.x-other.x)**2 + (self.y-other.y)**2)**0.5
+        if d < tolerance:
+            return True
+        else:
+            return False
 
 sprites = []
 
-# defenders = []
-# defender_weapons = []
-#
-# attackers = []
-# attacker_weapons = []
+defenders = []
+defender_weapons = []
+
+attackers = []
+attacker_weapons = []
 
 # Defenders
 for _ in range(10):
     x = random.randint(-500, -300)
     y = random.randint(-300, 300)
-    sprites.append(Sprite(x, y, "circle", "blue", "defender"))
+    defenders.append(Sprite(x, y, "circle", "blue", "defender"))
 
 # Attackers
-for _ in range(10):
+for _ in range(100):
     x = random.randint(300, 500)
     y = random.randint(-300, 300)
-    sprites.append(Sprite(x, y, "triangle", "red", "attacker"))
-    sprites[-1].heading = 180 #left
-    sprites[-1].dx = -0.2
+    attackers.append(Sprite(x, y, "triangle", "red", "attacker"))
+    attackers[-1].heading = 180 #left
+    attackers[-1].dx = -1.5
+    attackers[-1].dy = random.randint(-20, 20) / 20.0
 
 # Weapons
-for _ in range(10):
+for _ in range(50):
     x = -1000
     y = -1000
-    sprites.append(Sprite(x, y, "circle", "lightblue", "defender-weapon"))
-    sprites[-1].active = False
+    defender_weapons.append(Sprite(x, y, "circle", "lightblue", "defender-weapon"))
+    defender_weapons[-1].active = False
+    defender_weapons[-1].dy = random.randint(-10, 10) / 20.0
 
 # Main game loop
 while True:
     # Assign weapon to sprite
-    for sprite in sprites:
-        if sprite.unit == "defender":
-            for weapon in sprites:
-                if weapon.unit == "defender-weapon" and weapon.active == False:
-                    weapon.x = sprite.x
-                    weapon.y = sprite.y
-                    weapon.dx = 1
+    for defender in defenders:
+            for weapon in defender_weapons:
+                if weapon.active == False and random.randint(0, 100) > 95:
+                    weapon.x = defender.x
+                    weapon.y = defender.y
+                    weapon.dx = 5
                     weapon.active = True
                     break
 
+# Check for collisions between enemy & weapons
+    for weapon in defender_weapons:
+        if weapon.active == True:
+            for attacker in attackers:
+                if attacker.is_collision(weapon, 12):
+                    attacker.x += 1200
+                    attacker.y = random.randint(-300, 300)
+                    weapon.x = -1000
+                    weapon.active = False
+                    weapon.dx = 0
+                    break
 
     # Move
-    for sprite in sprites:
+    for sprite in defenders:
         sprite.move()
-    # Render
+        sprite.render()
+
+    for sprite in defender_weapons:
+        sprite.move()
+        sprite.render()
+
+    for sprite in attackers:
+        sprite.move()
         sprite.render()
 
     # Update screen

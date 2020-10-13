@@ -4,6 +4,9 @@
 
 import turtle
 import random
+import pygame
+
+from pygame import mixer
 
 wn = turtle.Screen()
 wn.setup(1200, 800)
@@ -11,6 +14,7 @@ wn.bgcolor("black")
 wn.title("Defender X Game by Robert Miller")
 wn.tracer(0)
 
+pygame.init()
 
 class Sprite():
     pen = turtle.Turtle()
@@ -62,6 +66,10 @@ class Sprite():
             return True
         else:
             return False
+
+# Background Sound
+mixer.music.load('bensound-evolution.mp3')
+mixer.music.play(-1)
 
 sprites = []
 

@@ -1,17 +1,21 @@
 # Defender X
 # By Robert Miller
 # Using Turtle Module
+# Python 3.7
 
 import turtle
 import random
 import pygame
+import math
+import time
+
 
 from pygame import mixer
 
 wn = turtle.Screen()
 wn.setup(1200, 800)
 wn.bgcolor("black")
-wn.title("Defender X Game by Robert Miller")
+wn.title("Mass Attack1 Game by Robert Miller")
 wn.tracer(0)
 
 pygame.init()
@@ -22,7 +26,7 @@ class Sprite():
     pen.speed(0)
     pen.penup()
 
-    def __init__(self, x, y, shape, color, unit):
+    def __init__(self, x, y, shape, color):
         self.x = x
         self.y = y
         self.shape = shape
@@ -32,33 +36,22 @@ class Sprite():
         self.dx = 0
         self.dy = 0
         self.speed = 0
-        self.unit = unit
         self.active = True
+        self.heading = 0
+        self.health = 10
 
     def render(self):
-        if self.unit == 'defender-weapon':
-            Sprite.pen.shapesize(0.2, 0.2, 0)
-        else:
             Sprite.pen.shapesize(1, 1, 0)
 
+            Sprite.pen.goto(self.x, self.y)
+            Sprite.pen.shape(self.shape)
+            Sprite.pen.color(self.color)
+            Sprite.pen.stamp()
 
-        Sprite.pen.goto(self.x, self.y)
-        Sprite.pen.shape(self.shape)
-        Sprite.pen.color(self.color)
-        Sprite.pen.stamp()
 
     def move(self):
         self.x += self.dx
         self.y += self.dy
-
-        # Boarder checks
-        if self.unit == "defender-weapon" and self.x > 600:
-                self.x = -1000
-                self.active = False
-
-        if self.unit == "attacker":
-            if self.y >300 or self.y < -300:
-                self.dy *= -1
 
     def is_collision(self, other, tolerance):
         d = ((self.x-other.x)**2 + (self.y-other.y)**2)**0.5
@@ -70,6 +63,65 @@ class Sprite():
 # Background Sound
 mixer.music.load('bensound-evolution.mp3')
 mixer.music.play(-1)
+
+
+class Defender(Sprite):
+    def __init__(self, x, y, shape, color):
+        Sprite.__init__(self, x, y, shape, color)
+
+    def render(self):
+        Sprite.pen.shapesize(1, 1, 0)
+
+        Sprite.pen.goto(self.x, self.y)
+        Sprite.pen.shape(self.shape)
+        Sprite.pen.color(self.color)
+        Sprite.pen.stamp()
+
+
+class DefenderWeapon(Sprite):
+    def __init__(self, x, y, shape, color):
+        Sprite.__init__(self, x, y, shape, color)
+
+    def render(self):
+        Sprite.pen.shapesize(0.2, 0.2, 0)
+
+        Sprite.pen.goto(self.x, self.y)
+        Sprite.pen.shape(self.shape)
+        Sprite.pen.color(self.color)
+        Sprite.pen.stamp()
+
+    def move(self):
+        self.x += self.dx
+        self.y += self.dy
+
+        if self.y > 390 or self.y < -390:
+            self.dy *= -1
+
+
+class Attacker(Sprite):
+    def __init__(self, x, y, shape, color):
+        Sprite.__init__(self, x, y, shape, color)
+
+    def render(self):
+        Sprite.pen.shapesize(1, 1, 0)
+
+        Sprite.pen.goto(self.x, self.y)
+        Sprite.pen.shape(self.shape)
+        Sprite.pen.colour(self.color)
+        Sprite.pen.stamp()
+
+    def move(self):
+        self.x += self.dx
+        self.y += self.dy
+
+        # Boarder checks
+        if self.unit == "defender-weapon" and self.x > 600:
+            self.x = -1000
+            self.active = False
+
+        if self.unit == "attacker":
+            if self.y > 300 or self.y < -300:
+                self.dy *= -1
 
 sprites = []
 
@@ -83,24 +135,28 @@ attacker_weapons = []
 for _ in range(10):
     x = random.randint(-500, -300)
     y = random.randint(-300, 300)
-    defenders.append(Sprite(x, y, "circle", "blue", "defender"))
+    defenders.append(Sprite(x, y, "circle", "blue"))
 
 # Attackers
 for _ in range(100):
     x = random.randint(300, 500)
     y = random.randint(-300, 300)
-    attackers.append(Sprite(x, y, "triangle", "red", "attacker"))
+    attackers.append(Defender(x, y, "triangle", "red",))
     attackers[-1].heading = 180 #left
-    attackers[-1].dx = -1.5
-    attackers[-1].dy = random.randint(-20, 20) / 20.0
 
 # Weapons
 for _ in range(50):
     x = -1000
     y = -1000
-    defender_weapons.append(Sprite(x, y, "circle", "lightblue", "defender-weapon"))
+    defender_weapons.append(DefenderWeapon(x, y, "circle", "lightblue"))
     defender_weapons[-1].active = False
     defender_weapons[-1].dy = random.randint(-10, 10) / 20.0
+
+def add_defender(x, y):
+    x = random.randint(-500, -300)
+    y = random.randint(-300, 300)
+    defenders.append(Sprite(x, y, "circle", "blue",))
+    defender_weapons.append(())
 
 # Main game loop
 while True:
@@ -110,7 +166,7 @@ while True:
                 if weapon.active == False and random.randint(0, 100) > 95:
                     weapon.x = defender.x
                     weapon.y = defender.y
-                    weapon.dx = 5
+                    weapon.dx = 10
                     weapon.active = True
                     break
 
@@ -141,6 +197,17 @@ while True:
 
     # Update screen
     wn.update()
+
+    # Check for a win
+    if len(attackers) == 0:
+        print("The Defenders win.")
+        time.sleep(3)
+        exit()
+
+    if len(defenders) == 0:
+        print("The Attackers win.")
+        time.sleep(3)
+        exit()
 
     # Clear screen
     Sprite.pen.clear()

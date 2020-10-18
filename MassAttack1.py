@@ -50,6 +50,10 @@ class Sprite():
 
 
     def move(self):
+
+        self.dx = math.cos(self.heading) * self.speed
+        self.dy = math.sin(self.heading) * self.speed
+
         self.x += self.dx
         self.y += self.dy
 
@@ -91,6 +95,9 @@ class DefenderWeapon(Sprite):
         Sprite.pen.stamp()
 
     def move(self):
+        self.dx = math.cos(self.heading) * self.speed
+        self.dy = math.sin(self.heading) * self.speed
+
         self.x += self.dx
         self.y += self.dy
 
@@ -111,6 +118,9 @@ class Attacker(Sprite):
         Sprite.pen.stamp()
 
     def move(self):
+        self.dx = math.cos(self.heading) * self.speed
+        self.dy = math.sin(self.heading) * self.speed
+
         self.x += self.dx
         self.y += self.dy
 
@@ -142,7 +152,8 @@ for _ in range(100):
     x = random.randint(300, 500)
     y = random.randint(-300, 300)
     attackers.append(Defender(x, y, "triangle", "red",))
-    attackers[-1].heading = 180 #left
+    attackers[-1].speed = random.randint(2, 5)
+    attackers[-1].heading = random.randint(160, 200)
 
 # Weapons
 for _ in range(50):
@@ -150,7 +161,6 @@ for _ in range(50):
     y = -1000
     defender_weapons.append(DefenderWeapon(x, y, "circle", "lightblue"))
     defender_weapons[-1].active = False
-    defender_weapons[-1].dy = random.randint(-10, 10) / 20.0
 
 def add_defender(x, y):
     x = random.randint(-500, -300)

@@ -152,7 +152,7 @@ for _ in range(10):
     defenders.append(Defender(x, y, "circle", "blue"))
 
 # Attackers
-for _ in range(200):
+for _ in range(100):
     x = random.randint(300, 500)
     y = random.randint(-300, 300)
     attackers.append(Attacker(x, y, "triangle", "red",))

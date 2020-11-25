@@ -146,13 +146,13 @@ attackers = []
 attacker_weapons = []
 
 # Defenders
-for _ in range(10):
+for _ in range(5):
     x = random.randint(-500, -300)
     y = random.randint(-300, 300)
     defenders.append(Defender(x, y, "circle", "blue"))
 
 # Attackers
-for _ in range(100):
+for _ in range(200):
     x = random.randint(300, 500)
     y = random.randint(-300, 300)
     attackers.append(Attacker(x, y, "triangle", "red",))
@@ -160,7 +160,7 @@ for _ in range(100):
     attackers[-1].heading = random.randint(160, 200)
 
 # Weapons
-for _ in range(50):
+for _ in range(35):
     x = -1000
     y = -1000
     defender_weapons.append(DefenderWeapon(x, y, "circle", "lightblue"))
@@ -208,7 +208,15 @@ while True:
         for defender in defenders:
             for attacker in attackers:
                 if attacker.is_collision(defender, 30):
-                    attackers.remove(attacker)
+                    # Lower attacker health
+                    attacker.health -= random.randint(3, 7)
+                    if attacker.health <= 0:
+                        attackers.remove(attacker)
+
+                    # Lower defender health
+                    defender.health -= random.randint(3, 7)
+                    if defender.health <= 0:
+                        defenders.remove(defender)
                     break
 
     # Move
@@ -228,9 +236,13 @@ while True:
     wn.update()
 
     # Check for a win
-
     if len(attackers) == 0:
         print("The Blue Defenders Win!!!")
+        time.sleep(3)
+        exit()
+
+    if len(defenders) == 0:
+        print("The Red Attackers Win!!!")
         time.sleep(3)
         exit()
 

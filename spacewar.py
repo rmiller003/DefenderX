@@ -23,7 +23,7 @@ pygame.init()
 
 num_of_defenders = 10
 num_of_attackers = 150
-num_of_defender_weapons = 30
+num_of_defender_weapons = 50
 num_of_attacker_weapons = 15
 
 class Sprite():
@@ -36,6 +36,7 @@ class Sprite():
         Sprite.pen.goto(x, y)
         Sprite.pen.color("white")
         Sprite.pen.write(text, font=("Courier New", 24, "normal"))
+
 
     def __init__(self, x, y, shape, color):
         self.x = x
@@ -361,6 +362,7 @@ while True:
                     defenders.remove(defender)
                 break
 
+
 # Move
     for sprite in defenders:
         sprite.move()
@@ -390,13 +392,13 @@ while True:
 
 # Check for a win
     if len(attackers) == 0:
-        print("The Blue Defenders Win!!!")
-        time.sleep(3)
+        Sprite.draw_text(-25, 150, "The Blue Defenders Win!!!")
+        time.sleep(6)
         exit()
 
     if len(defenders) == 0:
-        print("The Red Attackers Win!!!")
-        time.sleep(3)
+        Sprite.draw_text(-25, 150, "The Red Attackers Win!!!")
+        time.sleep(6)
         exit()
 
 # Clear screen

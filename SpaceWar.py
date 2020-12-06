@@ -14,11 +14,17 @@ from pygame import mixer
 wn = turtle.Screen()
 wn.setup(1200, 800)
 wn.bgcolor("black")
-wn.title("Mass Attack1 Game by Robert Miller")
+wn.title("Space War by Robert Miller")
 wn.tracer(0)
 
 pygame.init()
 
+# Testing / Start of game values
+
+num_of_defenders = 7
+num_of_attackers = 100
+num_of_defender_weapons = 30
+num_of_attacker_weapons = 10
 
 class Sprite():
     pen = turtle.Turtle()
@@ -72,7 +78,7 @@ mixer.music.play(-1)
 class Defender(Sprite):
     def __init__(self, x, y, shape, color):
         Sprite.__init__(self, x, y, shape, color)
-        self.health = 50
+        self.health = 90
 
     def render(self):
         Sprite.pen.shapesize(1, 1, 0)
@@ -82,6 +88,22 @@ class Defender(Sprite):
         Sprite.pen.color(self.color)
         Sprite.pen.stamp()
 
+         # Draw shields
+        color = "green"
+        if self.health > 35:
+            color = "green"
+        elif self.health > 15:
+            color = "yellow"
+        else:
+            color = "red"
+
+        Sprite.pen.goto(self.x + 20, self.y)
+        Sprite.pen.setheading(90)
+        Sprite.pen.pendown()
+        Sprite.pen.width(3)
+        Sprite.pen.color(color)
+        Sprite.pen.circle(20)
+        Sprite.pen.penup()
 
 class DefenderWeapon(Sprite):
     def __init__(self, x, y, shape, color):
@@ -189,13 +211,13 @@ for _ in range(50):
     particles.append(Particle(-1000, 0, "circle", color))
 
 # Defenders
-for _ in range(5):
+for _ in range(num_of_defenders):
     x = random.randint(-500, -300)
     y = random.randint(-300, 300)
     defenders.append(Defender(x, y, "circle", "blue"))
 
 # Attackers
-for _ in range(200):
+for _ in range(num_of_attackers):
     x = random.randint(300, 500)
     y = random.randint(-300, 300)
     attackers.append(Attacker(x, y, "triangle", "red", ))
@@ -203,12 +225,17 @@ for _ in range(200):
     attackers[-1].heading = random.randint(160, 200)
 
 # Weapons
-for _ in range(35):
+for _ in range(num_of_defender_weapons):
     x = -1000
     y = -1000
     defender_weapons.append(DefenderWeapon(x, y, "circle", "lightblue"))
     defender_weapons[-1].active = False
 
+for _ in range(num_of_attacker_weapons):
+    x = -1000
+    y = -1000
+    attacker_weapons.append(DefenderWeapon(x, y, "circle", "pink"))
+    attacker_weapons[-1].active = False
 
 def add_defender(x, y):
     defenders.append(Defender(x, y, "circle", "blue"))
@@ -234,17 +261,17 @@ while True:
             break
 
         # Assign weapon to sprite
-        for weapon in attacker_weapons:
-            if weapon.active == False:
-                attacker = random.choice(attackers)
-                weapon.x = attacker.x
-                weapon.y = attacker.y
-                weapon.active = True
+    for weapon in attacker_weapons:
+        if weapon.active == False:
+            attacker = random.choice(attackers)
+            weapon.x = attacker.x
+            weapon.y = attacker.y
+            weapon.active = True
 
-                # Find enemy to aim at
-                defender = random.choice(attackers)
-                weapon.heading = math.atan2(defender.y - attacker.y, defender.x - attacker.x) * 57.298
-                break
+            # Find enemy to aim at
+            defender = random.choice(defenders)
+            weapon.heading = math.atan2(defender.y - attacker.y, defender.x - attacker.x) * 57.298
+            break
 
     # Check for collisions between enemy & weapons
     for weapon in defender_weapons:
@@ -282,7 +309,7 @@ while True:
                 if defender.is_collision(weapon, 22):
                     # Start Particles
                     count = 0
-                    for particles in particles:
+                    for particle in particles:
                         if particle.active == False:
                             particle.active = True
                             particle.heading = random.randint(0, 360)

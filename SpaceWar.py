@@ -21,16 +21,21 @@ pygame.init()
 
 # Testing / Start of game values
 
-num_of_defenders = 7
-num_of_attackers = 100
+num_of_defenders = 10
+num_of_attackers = 150
 num_of_defender_weapons = 30
-num_of_attacker_weapons = 10
+num_of_attacker_weapons = 15
 
 class Sprite():
     pen = turtle.Turtle()
     pen.hideturtle()
     pen.speed(0)
     pen.penup()
+
+    def draw_text(x, y, text):
+        Sprite.pen.goto(x, y)
+        Sprite.pen.color("white")
+        Sprite.pen.write(text, font=("Courier New", 24, "normal"))
 
     def __init__(self, x, y, shape, color):
         self.x = x
@@ -134,7 +139,7 @@ class DefenderWeapon(Sprite):
 class Attacker(Sprite):
     def __init__(self, x, y, shape, color):
         Sprite.__init__(self, x, y, shape, color)
-        self.health = 10
+        self.health = 20
 
     def render(self):
         Sprite.pen.shapesize(1, 1, 0)
@@ -159,6 +164,7 @@ class Attacker(Sprite):
         # Moves off screen
         if self.x < -600:
             self.x += random.randint(1200, 1500)
+            self.speed *= 1.1
 
 
 class Particle(Sprite):
@@ -366,6 +372,9 @@ while True:
     for sprite in particles:
         sprite.move()
         sprite.render()
+
+    Sprite.draw_text(-300, 340, f"Defenders: {len(defenders)}")
+    Sprite.draw_text(200, 340, f"Attackers: {len(attackers)}")
 
 # Update screen
     wn.update()

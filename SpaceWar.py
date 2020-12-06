@@ -251,8 +251,17 @@ def add_defender(x, y):
 
 wn.onclick(add_defender)
 
+game_state = "splash"
+
 # Main game loop
 while True:
+    #clear the screen
+    #pen.clear()
+
+    # Game code here
+    if game_state == "splash":
+        wn.bgpic("splash.gif")
+
     # Assign weapon to sprite
     for weapon in defender_weapons:
         if weapon.active == False:
